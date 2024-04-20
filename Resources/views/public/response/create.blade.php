@@ -62,7 +62,7 @@
             <div class="card-body">
                 {{-- Renderizamos los campos del formulario --}}
                 @foreach($datos as $dato)
-                    @include('modules.dynamic-form.partials.field_show',['field'=>$dato])
+                    @include('dynamicform::public.partials.field_show',['field'=>$dato])
                 @endforeach
             </div>
         </div>
@@ -77,8 +77,6 @@
                 </div>
             </div>
         </div>
-
-
     </div>
 
 </form>
@@ -332,7 +330,7 @@
             if (imageIndex < maxImages) {
                 const context = canvas.getContext('2d');
                 context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                const imageData = canvas.toDataURL('image/jpeg');
+                const imageData = canvas.toDataURL('image/png');
                 displayImage(imageData, fieldId);
                 // Llamar a la función para subir el archivo al almacenamiento
                 uploadImageToServer(fieldId, label, type, canvasId);

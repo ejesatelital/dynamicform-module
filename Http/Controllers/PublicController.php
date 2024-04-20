@@ -26,8 +26,6 @@ class PublicController extends AdminBaseController
         $this->form = $form;
     }
 
-
-
     /**
      * Display a listing of the resource.
      *

@@ -59,7 +59,6 @@ class FormController extends AdminBaseController
         ]));
 
         $forms=$this->form->getItemsBy($params_form);
-
         return view('dynamicform::public.forms.indexcolaboradoresform', compact('forms'));
     }
 
@@ -95,7 +94,6 @@ class FormController extends AdminBaseController
         if (!session()->has('company')) {
             return redirect()->back()->with("warning", "Selecciona una empresa");
         }
-
 
         return view('dynamicform::public.forms.create');
     }

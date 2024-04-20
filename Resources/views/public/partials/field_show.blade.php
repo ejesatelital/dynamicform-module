@@ -131,7 +131,7 @@
                             <a class="waves-effect text-danger m-3 mt-1" onclick="cancelCamera('{{$field->id}}')">Cerrar camara</a>
                         </div>
 
-                        <video id="video-{{$field->id}}" width="240" height="240" autoplay></video>
+                        <video id="video-{{$field->id}}" class="form-control" width="250" height="250" autoplay></video>
                         <div class="card-footer">
                             <button type="button" id="captureButton-{{$field->id}}" class="btn btn-primary" onclick="captureImage({{$field->id}}, '{{$field->label}}', {{$field->type}})"><i class="fas fa-camera"></i> Capturar imagen</button>
                             <button type="button" id="uploadButton-{{$field->id}}" class="btn btn-info" onclick="uploadImage({{$field->id}}, '{{$field->label}}', {{$field->type}})"><i class="far fa-images"></i> Cargar imagen</button>
@@ -142,7 +142,7 @@
                 <div class="col-lg-6 col-md-12">
                     <div class="card">
                         <div class="card-body">
-                            <canvas id="canvas-{{$field->id}}" width="960px" height="940px" style="display: none;"></canvas>
+                            <canvas id="canvas-{{$field->id}}" width="480px" height="720px" style="display: none;"></canvas>
                             <div id="gallery-{{$field->id}}"></div>
                         </div>
                     </div>
@@ -234,7 +234,7 @@
             </div>
             @break
 
-        {{-- Input tipo text --}}
+        {{-- Input type title --}}
         @case(12)
             <div class="row mt-2">
                 <div class="col-lg-12 col-md-12 text-center">

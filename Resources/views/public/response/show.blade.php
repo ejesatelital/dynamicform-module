@@ -80,7 +80,7 @@
                         {{-- Renderizamos los campos del formulario --}}
                         @foreach($form_response->data->answers as $dato)
                             {{-- Incluimos la vista del campo con el valor establecido --}}
-                            @include('modules.dynamic-form.partials.field_response', ['field' => $dato])
+                            @include('dynamicform::public.partials.field_response', ['field' => $dato])
                         @endforeach
                     </div>
 

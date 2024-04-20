@@ -63,7 +63,7 @@
                             </thead><!-- end thead -->
                             <tbody>
                             @foreach($form_response->data->answers as $answer)
-                                @include('modules.dynamic-form.partials.field',['fiel'=>$answer])
+                                @include('dynamicform::public.partials.field',['fiel'=>$answer])
                                 <!-- end tr -->
                             @endforeach
                             </tbody><!-- end tbody -->

@@ -20,11 +20,29 @@ $router->group(['prefix' =>'/preoperativo','middleware' => 'auth.admin'], functi
             'middleware' => 'can:dynamicform.formresponses.index'
         ]);
 
-        // $router->get('/report', [
-        //     'as' => 'dynamicform.form.formreport',
-        //     'uses' => 'ResponseController@formreport',
-        //     'middleware' => 'can:dynamicform.formresponses.index'
-        // ]);
+        $router->get('/reports_vehicles', [
+            'as' => 'dynamicform.form.reports_vehicles',
+            'uses' => 'ResponseController@reports_vehicles',
+            'middleware' => 'can:dynamicform.formresponses.index'
+        ]);
+
+        $router->post('/download_report_by_day', [
+            'as' => 'dynamicform.form.download_report_day',
+            'uses' => 'ResponseController@download_report_day',
+            'middleware' => 'can:dynamicform.formresponses.index'
+        ]);
+
+        $router->post('/download_report_by_month', [
+            'as' => 'dynamicform.form.download_report_month',
+            'uses' => 'ResponseController@download_report_month',
+            'middleware' => 'can:dynamicform.formresponses.index'
+        ]);
+
+        $router->post('/download_report_by_general', [
+            'as' => 'dynamicform.form.download_report_general',
+            'uses' => 'ResponseController@download_report_general',
+            'middleware' => 'can:dynamicform.formresponses.index'
+        ]);
 
         $router->get('/{form}/show', [
             'as' => 'dynamicform.form.show',
@@ -110,7 +128,7 @@ $router->group(['prefix' =>'/preoperativo','middleware' => 'auth.admin'], functi
                 'middleware' => 'can:dynamicform.formresponses.index'
             ]);
 
-            $router->get('/{form_response}', [
+            $router->get('/{form_response}/show', [
                 'as' => 'dynamicform.formresponses.show',
                 'uses' => 'ResponseController@show',
                 'middleware' => 'can:dynamicform.formresponses.index'
