@@ -156,13 +156,20 @@
                             let actionsHtml = '<div class="d-flex justify-content-center align-items-center gap-4">';
                             actionsHtml += '<a href="/preoperativo/form/'+ row.cells[0].data + '/show" data-bs-toggle="tooltip" data-bs-placement="top" title="Vista previa" class="text-info"><i class="mdi mdi-eye-outline me-1 mdi-24px"></i></a>';
                             let hasAccessEdit = {{$currentUser->hasAccess('dynamicform.forms.edit') ? 'true' : 'false'}};
-                            let hasAccessIndexall = {{$currentUser->hasAccess('dynamicform.forms.indexall') ? 'true' : 'false'}};
+                            let hasAccessIndexAll = {{ $currentUser->hasAccess('dynamicform.forms.indexall') ? 'true' : 'false' }};
 
-                            if (hasAccessEdit ) {
-                                if (company == row.cells[6].data){
+                            // Verificar si tiene acceso a indexall para mostrar todas las opciones
+                            if (hasAccessIndexAll) {
+                                actionsHtml +=
+                                    '<a href="/preoperativo/form/' + row.cells[0].data + '/edit" data-bs-toggle="tooltip" data-bs-placement="top" title="Editar" class="text-success btn-lg"><i class="mdi mdi-clipboard-edit-outline mdi-24px"></i></a>'
+                                    + '<a href="" data-bs-toggle="tooltip" data-bs-placement="top" title="Borrar" onclick="stateField(event, '+ row.cells[0].data +')" >' + (row.cells[4].data == '1' ? '<i class="mdi mdi-lock-open mdi-24px"></i>' : '<i class="mdi mdi-lock mdi-24px text-secondary"></i>') + '</a>';
+                                }
+
+                            else{
+                                if (hasAccessEdit && company == row.cells[6].data){
                                     actionsHtml +=
                                     '<a href="/preoperativo/form/' + row.cells[0].data + '/edit" data-bs-toggle="tooltip" data-bs-placement="top" title="Editar" class="text-success btn-lg"><i class="mdi mdi-clipboard-edit-outline mdi-24px"></i></a>'
-                                    + '<a href="" data-bs-toggle="tooltip" data-bs-placement="top" title="Borrar" onclick="deleteField(event, '+ row.cells[0].data +')" >' + (row.cells[4].data == '1' ? '<i class="mdi mdi-lock-open mdi-24px"></i>' : '<i class="mdi mdi-lock mdi-24px text-secondary"></i>') + '</a>';
+                                    + '<a href="" data-bs-toggle="tooltip" data-bs-placement="top" title="Borrar" onclick="stateField(event, '+ row.cells[0].data +')" >' + (row.cells[4].data == '1' ? '<i class="mdi mdi-lock-open mdi-24px"></i>' : '<i class="mdi mdi-lock mdi-24px text-secondary"></i>') + '</a>';
                                 }
                             }
                             actionsHtml += '</div>';
@@ -210,7 +217,7 @@
             },
         }).render(document.getElementById("table-form"));
 
-        function deleteField(event, field) {
+        function stateField(event, field) {
             event.preventDefault(); // Evita que el navegador siga el enlace
 
             Swal.fire({
@@ -223,8 +230,9 @@
                 cancelButtonText: "Cancelar"
                 }).then((result) => {
                 if (result.isConfirmed) {
-                    // Realizar la solicitud DELETE con Axios
-                    axios.put(`/preoperativo/form/${field}/borrar`, {
+                    const route = `{{ route('api.dynamicform.form.state', ['form' => ':field']) }}`.replace(':field', field);
+                    // Realizar la solicitud PUT con Axios
+                    axios.put(route, {}, {
                         headers: {
                             'Authorization': `Bearer {{$currentUser->getFirstApiKey()}}`,
                             'Content-Type': 'application/json'
@@ -242,13 +250,13 @@
                             mygrid.forceRender();
                         } else {
                             // Manejar el caso en que la solicitud no fue exitosa
-                            throw new Error('Error al eliminar el campo');
+                            throw new Error('Error al cambiar el estado del campo');
                         }
                     })
                     .catch(error => {
                         // Manejar errores
                         console.error(error);
-                        Swal.fire('Error al eliminar el campo');
+                        Swal.fire('Error al cambiar el estado del campo');
                     });
                 }
             });

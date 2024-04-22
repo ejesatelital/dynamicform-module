@@ -75,20 +75,6 @@ class FieldController extends AdminBaseController
         return redirect()->route('dynamicform.form.edit', $field->form_id)->withSuccess(trans('core::core.messages.resource updated', ['name' => trans('dynamicfield::fields.title.fields')]));
     }
 
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  Field $field
-     * @return Response
-     */
-    public function destroy($form, Field $field)
-    {
-        $this->field->destroy($field);
-
-        return response()->json(['message' => trans('core::core.messages.resource deleted', ['name' => trans('dynamicfield::fields.title.fields')])]);
-    }
-
     /**
      * Update the specified resource in storage.
      *

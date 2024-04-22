@@ -145,19 +145,4 @@ class FormController extends AdminBaseController
         return redirect()->route('dynamicform.form.index')->withSuccess(trans('core::core.messages.resource updated', ['name' => trans('dynamicform::forms.title.forms')]));
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  Form $form
-     * @return Response
-     */
-    public function destroy(Form $form)
-    {
-        if (!$form) {
-            return response()->json(['message' => 'Registro no encontrado'], 404);
-        }
-        $form->active = $form->active == 0 ? 1 : 0;
-        $form->save();
-        return response()->json(['message' => 'Registro borrado exitosamente'], 200);
-    }
 }

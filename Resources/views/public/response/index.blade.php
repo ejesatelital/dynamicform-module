@@ -184,8 +184,12 @@
                 cancelButtonText: "Cancelar"
                 }).then((result) => {
                 if (result.isConfirmed) {
-                     // Realizar la solicitud DELETE con Axios
-                    axios.delete(`/preoperativo/form/{{$form->id}}/response/${field}/borrar`, {
+
+                    // Generar la URL de la solicitud DELETE con el ID del formulario y la ID del campo
+                    var route = `{{ route('api.dynamicform.formresponse.destroy', ['responses' => ':formresponseId']) }}`;
+                    route = route.replace(':formresponseId', field);
+
+                    axios.delete(route, {
                         headers: {
                             'Authorization': `Bearer {{$currentUser->getFirstApiKey()}}`,
                             'Content-Type': 'application/json'

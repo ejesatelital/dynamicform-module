@@ -108,18 +108,6 @@ class ResponseController extends AdminBaseController
             return response()->json($response, $status ?? 200);
         }
     }
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  FormResponse $form_response
-     * @return Response
-     */
-    public function destroy($form, FormResponse $form_response)
-    {
-        $this->form_response->destroy($form_response);
-
-        return response()->json(['message' => trans('core::core.messages.resource deleted', ['name' => trans('dynamicfield::fields.title.fields')])]);
-    }
 
     /**
      * Download the view from responses to pdf

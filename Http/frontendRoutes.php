@@ -69,11 +69,6 @@ $router->group(['prefix' =>'/preoperativo','middleware' => 'auth.admin'], functi
             'uses' => 'FormController@update',
             'middleware' => 'can:dynamicform.forms.edit'
         ]);
-        $router->put('/{form}/borrar', [
-            'as' => 'dynamicform.form.destroy',
-            'uses' => 'FormController@destroy',
-            'middleware' => 'can:dynamicform.forms.destroy'
-        ]);
 
         $router->group(['prefix' =>'/{form}/field'], function (Router $router) {
             $router->get('/create', [
@@ -96,11 +91,7 @@ $router->group(['prefix' =>'/preoperativo','middleware' => 'auth.admin'], functi
                 'uses' => 'FieldController@update',
                 'middleware' => 'can:dynamicform.fields.edit'
             ]);
-            $router->delete('/{field}/borrar', [
-                'as' => 'dynamicform.field.destroy',
-                'uses' => 'FieldController@destroy',
-                'middleware' => 'can:dynamicform.fields.destroy'
-            ]);
+
             // METODO PUT SI ES OK RENDERIZAR LA TABLA
             $router->put('/{field}/orden/{orden}', [
                 'as' => 'dynamicform.field.orden',
@@ -150,12 +141,6 @@ $router->group(['prefix' =>'/preoperativo','middleware' => 'auth.admin'], functi
                 'as' => 'dynamicform.formresponses.downloadpdf',
                 'uses' => 'ResponseController@downloadpdf',
                  'middleware' => 'can:dynamicform.formresponses.edit'
-            ]);
-
-            $router->delete('/{form_response}', [
-                'as' => 'dynamicform.formresponses.destroy',
-                'uses' => 'ResponseController@destroy',
-                'middleware' => 'can:dynamicform.formresponses.destroy'
             ]);
 
         });

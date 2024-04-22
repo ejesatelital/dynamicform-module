@@ -436,14 +436,15 @@
                 cancelButtonText: "Cancelar"
                 }).then((result) => {
                 if (result.isConfirmed) {
-                     // Realizar la solicitud DELETE con Axios
-                    axios.delete(`/preoperativo/form/{{$form->id}}/field/${field}/borrar`, {
+                    // Generar la URL de la solicitud DELETE con el ID del campo
+                    var route = `{{ route('api.dynamicform.field.destroy', ['form' => $form->id, 'field' => ':fieldId']) }}`;
+                    route = route.replace(':fieldId', field);
+                    axios.delete(route, {
                         headers: {
-                            'Authorization': `Bearer {{$currentUser->getFirstApiKey()}}`,
+                            'Authorization': `Bearer {{ $currentUser->getFirstApiKey() }}`,
                             'Content-Type': 'application/json'
                         }
-                    })
-                    .then(response => {
+                    }).then(response => {
                         // Verificar si la solicitud fue exitosa
                         if (response.status === 200) {
                             Swal.fire({

@@ -240,15 +240,15 @@ class FormResponseApiController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function destroy(string $criteria, Request $request): JsonResponse
+    public function destroy(FormResponse $formresponse): JsonResponse
     {
         \DB::beginTransaction();
 
         try {
 
-            $params = $this->getParamsRequest($request);
+            // $params = $this->getParamsRequest($request);
 
-            $formresponse = $this->formresponse->getItem($params);
+            // $formresponse = $this->formresponse->getItem($params);
 
             if (!$formresponse) throw new Exception(trans('core::core.exceptions.item no found', ['item' => trans('dynamicform::formresponses.title.formresponses')]), 404);
 
