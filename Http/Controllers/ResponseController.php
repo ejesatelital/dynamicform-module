@@ -195,19 +195,7 @@ class ResponseController extends AdminBaseController
 
         $documento->getActiveSheet(0)->setTitle('Report'); // NOMBRE DE LA LA HOJA
 
-        //IMAGEN DEL DOCUMENTO
-        $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
-        $drawing->setName('logo');
-        $drawing->setDescription('logo');
-        $drawing->setPath(public_path('/assets/company/2/Logo_SPSM.png'));
-        $drawing->setCoordinates('E3');
-        $drawing->setOffsetX(10);
-        $drawing->setOffsetY(5);
-        $drawing->setResizeProportional(false);
-        $drawing->setWidthAndHeight(400, 130); //set width, height
-        $drawing->setWorksheet($documento->getActiveSheet(0));
-
-        #ACCEDEMOS A LA HOJA DE TRABAJO LIQUIDACIÓN
+          #ACCEDEMOS A LA HOJA DE TRABAJO LIQUIDACIÓN
         $reportdaysheet = $documento->getActiveSheet(0);
         //hoja de calculo de materiales
         $this->reportdaysheet($reportdaysheet, $responses_per_day);
@@ -251,6 +239,26 @@ class ResponseController extends AdminBaseController
         $sheet->getColumnDimension('C')->setWidth(60.42);
         $sheet->getColumnDimension('D')->setWidth(40.42);
         $sheet->getColumnDimension('E')->setWidth(60.42);
+
+        if($data->company->logo!=null){
+            $path = public_path($data->company->logo);
+        }
+        else
+        {
+            $path = public_path('/assets/company/1/logo2.jpeg');
+        }
+
+        //IMAGEN DEL DOCUMENTO
+        $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
+        $drawing->setName('logo');
+        $drawing->setDescription('logo');
+        $drawing->setPath($path);
+        $drawing->setCoordinates('E3');
+        $drawing->setOffsetX(10);
+        $drawing->setOffsetY(5);
+        $drawing->setResizeProportional(false);
+        $drawing->setWidthAndHeight(400, 130); //set width, height
+        $drawing->setWorksheet($sheet);
 
         // //Aplico los estilo de color de letra y fondo para el titulo y los subtitulos
         // $sheet->getStyle("B2:E2")->getFont()->getColor()->applyFromArray(['rgb' => 'FFFFFF']);
@@ -466,11 +474,19 @@ class ResponseController extends AdminBaseController
         $sheet->getRowDimension(6)->setRowHeight(17.42);
         $sheet->getRowDimension(7)->setRowHeight(10.42);
 
+        if($data->first()->company->logo!=null){
+            $path = public_path($data->first()->company->logo);
+        }
+        else
+        {
+            $path = public_path('/assets/company/1/logo2.jpeg');
+        }
+
         //IMAGEN DEL DOCUMENTO
         $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
         $drawing->setName('logo');
         $drawing->setDescription('logo');
-        $drawing->setPath(public_path('/assets/company/2/Logo_SPSM.png'));
+        $drawing->setPath($path);
         $drawing->setCoordinates('X3');
         $drawing->setOffsetX(10);
         $drawing->setOffsetY(5);
@@ -698,11 +714,18 @@ class ResponseController extends AdminBaseController
         $sheet->getRowDimension(6)->setRowHeight(17.42);
         $sheet->getRowDimension(7)->setRowHeight(10.42);
 
+        if($data->first()->company->logo!=null){
+            $path = public_path($data->first()->company->logo);
+        }
+        else
+        {
+            $path = public_path('/assets/company/1/logo2.jpeg');
+        }
         //IMAGEN DEL DOCUMENTO
         $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
         $drawing->setName('logo');
         $drawing->setDescription('logo');
-        $drawing->setPath(public_path('/assets/company/2/Logo_SPSM.png'));
+        $drawing->setPath($path);
         $drawing->setCoordinates('X3');
         $drawing->setOffsetX(10);
         $drawing->setOffsetY(5);
