@@ -54,12 +54,16 @@ class FormResponseApiController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-
         try {
             $includes = explode(',', $request->input('include'));
 
             $params = json_decode(json_encode(['filter' =>
             [
+                'date' => [
+                    'field' => 'created_at',
+                    'from' => json_decode($request->input('date'))->from,
+                    'to' => json_decode($request->input('date'))->to
+                ],
                 'search' => $request->input('search'),
                 'companies' => $request->input('companies'),
                 'form_id' => $request->input('form_id')
@@ -67,7 +71,6 @@ class FormResponseApiController extends Controller
             'include' => $includes, 'page' => $request->input('page'), 'take' => $request->input('limit')]));
 
             $formresponses = $this->formresponse->getItemsBy($params);
-            // dd($includes, $params, $formresponses);
 
             $response = ["data" => FormResponseTransformer::collection($formresponses)];
 

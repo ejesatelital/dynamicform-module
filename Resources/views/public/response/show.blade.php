@@ -20,7 +20,20 @@
         @endslot
     @endcomponent
     <div class="row">
+
+
+    </div>
+
+
+    <div class="row">
         {{-- <div class="col"> --}}
+            <div class="d-print-none mb-2">
+                <div class="float-end">
+                    <button type="button" class="btn btn-secondary" onclick="goBack()">Volver Atrás</button>
+                </div>
+            </div>
+
+
             <div class="card">
                 <div class="card-body">
                     <div class="invoice-title">
@@ -118,6 +131,12 @@
             })
         })();
     </script>
+    <script type="text/javascript">
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+
     <style>
         .fade:not(.show) {
             opacity: 1;

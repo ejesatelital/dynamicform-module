@@ -6,10 +6,11 @@
 @section('css')
     {!! Theme::style('libs/sweetalert2/sweetalert2.min.css?v='.config('app.version')) !!}
     {!! Theme::style('libs/alertifyjs/alertifyjs.min.css?v='.config('app.version')) !!}
+    <link rel="stylesheet" href="{{Theme::url('libs/flatpickr/flatpickr.min.css')}}">
     {!! Theme::style('libs/@simonwep/@simonwep.min.css?v='.config('app.version')) !!}
     {!! Theme::style('libs/gridjs/gridjs.min.css?v='.config('app.version')) !!}
     <link href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" rel="stylesheet">
-    {!! Theme::style('libs/fontawesome-iconpicker/dist/css/fontawesome-iconpicker.min.css?v='.config('app.version')) !!}
+    {{-- {!! Theme::style('libs/fontawesome-iconpicker/dist/css/fontawesome-iconpicker.min.css?v='.config('app.version')) !!} --}}
 @endsection
 
 @section('content')
@@ -23,10 +24,15 @@
     @endcomponent
 
     <div class="row">
+        <div class="d-print-none mb-2">
+            <div class="float-end">
+                <button type="button" class="btn btn-secondary" onclick="goBack()">Volver Atrás</button>
+            </div>
+        </div>
+
         <div class="col-lg-12">
             <div class="card">
-                    <div class="p-4">
-
+                    <div class="p-3">
                         <div class="d-flex align-items-center">
                             <div class="flex-grow-1 overflow-hidden">
                                 <h5 class="font-size-16 mb-1">Respuestas</h5>
@@ -34,17 +40,46 @@
                             </div>
                         </div>
                     </div>
-                    <div class="p-4 border-top">
+                    <div class="p-3 border-top">
                         <div class="row">
                             <div class="col-12">
                                 <div class="card">
                                     <div class="card-body">
                                         <div class="position-relative">
-                                            <div class="modal-button mt-2">
+                                            <div class="modal-button">
                                                 <div class="row align-items-start">
+
+                                                    <div class="col-sm-auto">
+                                                        <div class="d-flex gap-2">
+                                                            <div class="input-group">
+                                                                <input type="text" class="form-control" id="datepicker-range" style="width: 250px;">
+                                                                <span class="input-group-text"><i class="bx bx-calendar-event"></i></span>
+                                                            </div>
+                                                            <div class="dropdown">
+                                                                <a class="btn btn-link text-body shadow-none dropdown-toggle" href="#"
+                                                                   role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                    <i class="bx bx-dots-horizontal-rounded"></i>
+                                                                </a>
+
+                                                                <ul class="dropdown-menu dropdown-menu-end">
+                                                                    <li>
+                                                                        <button id="today" class="dropdown-item">Hoy</button>
+                                                                    </li>
+                                                                    <li>
+                                                                        <button id="yesterday" class="dropdown-item">Ayer</button>
+                                                                    </li>
+                                                                    <li>
+                                                                        <button id="thirtyday" class="dropdown-item">30 dias</button>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
+                                                <!-- end row -->
                                             </div>
                                         </div>
+
                                         <div id="table-response"></div>
                                     </div>
                                 </div>
@@ -57,6 +92,8 @@
 @endsection
 @section('script')
     <script src="{{ Theme::url('libs/gridjs/gridjs.min.js') }}"></script>
+    <script src="{{ Theme::url('libs/flatpickr/flatpickr.min.js') }}"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/es.js"></script>
     <script src="{{ Theme::url('libs/@simonwep/@simonwep.min.js') }}"></script>
     <script src="{{ Theme::url('js/app.js')}}"></script>
     <script src="{{ Theme::url('libs/alertifyjs/alertifyjs.min.js') }}"></script>
@@ -67,6 +104,17 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
     <script type="application/javascript" async>
+
+        let initDate=moment().subtract(7,'d').format('YYYY-MM-DD');
+        let endDate=moment().format('YYYY-MM-DD HH:mm:ss');
+        flatpickr('#datepicker-range', {
+            locale: "es",
+            defaultDate: [initDate, endDate],
+            dateFormat: "Y-m-d",
+            mode: "range"
+        });
+        let range={from:initDate,to:endDate};
+
         const gridresponse = new gridjs.Grid({
             language: {
                 'search': {
@@ -116,8 +164,7 @@
                     {
                         id: "created_at",
                         name: "Creado el",
-                        width: '150px',
-                        order: true
+                        width: '200px',
                     },
                     {
                         id: "id",
@@ -147,6 +194,7 @@
                 }
             },
             search: {
+                debounceTimeout: 1000,
                 server: {
                     url: (prev, keyword) => `${prev}&search=${keyword}`
                 }
@@ -159,7 +207,7 @@
                     })->toArray());
                     $params=['include'=>'form,user,company','form_id'=>$form->id,'companies'=>$companies];
                 @endphp
-                url: '{!!route('api.dynamicform.formresponse.index',$params)!!}',
+                url: '{!!route('api.dynamicform.formresponse.index',$params)!!}&date='+JSON.stringify(range),
                 headers: {
                     Authorization: `Bearer {{$currentUser->getFirstApiKey()}}`,
                     'Content-Type': 'application/json'
@@ -169,6 +217,113 @@
             }
         }).render(document.getElementById("table-response"));
 
+        let dateRange=document.getElementById("datepicker-range");
+        let inputFilter=document.getElementById("filter");
+        dateRange.addEventListener('change', function () {
+           let dateR= dateRange.value.split(' ');
+            initDate=dateR[0];
+           if(dateR[2]){
+               endDate=dateR[2];
+           }else{
+               endDate=dateR[0];
+           }
+
+            range={from:initDate,to:endDate};
+            gridresponse.updateConfig({
+                server: {
+                    url: '{!!route('api.dynamicform.formresponse.index',$params)!!}&date='+JSON.stringify(range),
+                    headers: {
+                        Authorization: `Bearer {{$currentUser->getFirstApiKey()}}`,
+                        'Content-Type': 'application/json'
+                    },
+                    then: data => data.data,
+                    total: data => data.meta.page.total
+                }
+            }).forceRender();
+        });
+
+
+        let today=document.getElementById("today");
+
+        today.addEventListener('click',function () {
+            initDate=moment().format('YYYY-MM-DD');
+            initDate=initDate+' 00:00:00'
+            endDate=moment().format('YYYY-MM-DD HH:mm:ss');
+            range={from:initDate,to:endDate};
+            gridresponse.updateConfig({
+                server: {
+                    url: '{!!route('api.dynamicform.formresponse.index',$params)!!}&date='+JSON.stringify(range),
+                    headers: {
+                        Authorization: `Bearer {{$currentUser->getFirstApiKey()}}`,
+                        'Content-Type': 'application/json'
+                    },
+                    then: data => data.data,
+                    total: data => data.meta.page.total
+                }
+            }).forceRender();
+
+            flatpickr('#datepicker-range', {
+                locale: "es",
+                defaultDate: [initDate, endDate],
+                dateFormat: "Y-m-d",
+                mode: "range"
+            });
+        });
+
+        let yesterday=document.getElementById("yesterday");
+
+        yesterday.addEventListener('click',function () {
+            initDate=moment().subtract(1,'d').format('YYYY-MM-DD');
+            initDate=initDate+' 00:00:00'
+            endDate=moment().subtract(1,'d').format('YYYY-MM-DD');
+            endDate=endDate+' 23:59:59'
+            range={from:initDate,to:endDate};
+            gridresponse.updateConfig({
+                server: {
+                    url: '{!!route('api.dynamicform.formresponse.index',$params)!!}&date='+JSON.stringify(range),
+                    headers: {
+                        Authorization: `Bearer {{$currentUser->getFirstApiKey()}}`,
+                        'Content-Type': 'application/json'
+                    },
+                    then: data => data.data,
+                    total: data => data.meta.page.total
+                }
+            }).forceRender();
+
+            flatpickr('#datepicker-range', {
+                locale: "es",
+                defaultDate: [initDate, endDate],
+                dateFormat: "Y-m-d",
+                mode: "range"
+            });
+        });
+
+        let thirtyday=document.getElementById("thirtyday");
+
+        thirtyday.addEventListener('click',function () {
+            initDate=moment().subtract(30,'d').format('YYYY-MM-DD');
+            initDate=initDate+' 00:00:00'
+            endDate=moment().format('YYYY-MM-DD HH:mm:ss');
+            range={from:initDate,to:endDate};
+            gridresponse.updateConfig({
+                server: {
+                    url: '{!!route('api.dynamicform.formresponse.index',$params)!!}&date='+JSON.stringify(range),
+                    headers: {
+                        Authorization: `Bearer {{$currentUser->getFirstApiKey()}}`,
+                        'Content-Type': 'application/json'
+                    },
+                    then: data => data.data,
+                    total: data => data.meta.page.total
+                }
+            }).forceRender();
+
+            flatpickr('#datepicker-range', {
+                locale: "es",
+                defaultDate: [initDate, endDate],
+                dateFormat: "Y-m-d",
+                mode: "range"
+            });
+        });
 
         function deleteResponse(event, field) {
             event.preventDefault(); // Evita que el navegador siga el enlace
@@ -218,7 +373,15 @@
                 }
             });
         }
+
     </script>
+
+    <script type="text/javascript">
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+
     <style>
         .fade:not(.show) {
             opacity: 1;
