@@ -24,6 +24,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 
 class ResponseController extends AdminBaseController
 {
@@ -228,14 +229,8 @@ class ResponseController extends AdminBaseController
         $sheet->getColumnDimension('D')->setWidth(40.42);
         $sheet->getColumnDimension('E')->setWidth(60.42);
 
-        if($data->company->logo!=null){
-            $path = public_path($data->company->logo);
-        }
-        else
-        {
-            $path = public_path('/assets/company/1/logo2.jpeg');
-        }
-
+        // $path = $data->company->present()->gravatar;
+        $path = public_path($data->company->logo);
         //IMAGEN DEL DOCUMENTO
         $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
         $drawing->setName('logo');
@@ -803,6 +798,7 @@ class ResponseController extends AdminBaseController
             }
         }
 
+
         $row = 10;
 
         foreach ($plateDays as $placa => $dias) {
@@ -811,14 +807,12 @@ class ResponseController extends AdminBaseController
             // Iterar sobre las columnas para escribir el negative_num en las celdas correspondientes a los días
             foreach ($dias as $dia => $negative_num) {
                 // Calcular la columna correspondiente al día
-                $columna = chr(64 + $dia + 2); // Convertir el número del día a letra de columna (A, B, C, ...) + 2 porque arranca en la columna C
-
+                $columna = Coordinate::stringFromColumnIndex($dia + 2); // Convertir el número del día a letra de columna (A, B, C, ...) + 2 porque arranca en la columna C
                 // Escribir el negative_num en la celda correspondiente
-                $sheet->setCellValue($columna . $row, $negative_num);
+                $sheet->setCellValue($columna . $row, $negative_num ?? 0);
             }
             $row++;
         }
-
 
         //retornamos los datos y estilos
         return $sheet;
