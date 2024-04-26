@@ -229,7 +229,6 @@ class ResponseController extends AdminBaseController
         $sheet->getColumnDimension('D')->setWidth(40.42);
         $sheet->getColumnDimension('E')->setWidth(60.42);
 
-        // $path = $data->company->present()->gravatar;
         $path = public_path($data->company->logo);
         //IMAGEN DEL DOCUMENTO
         $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
@@ -384,7 +383,11 @@ class ResponseController extends AdminBaseController
             // Almacenar las respuestas del item en la fecha correspondiente
             foreach ($item->answers as $answer) {
                 // Agregar la respuesta al arreglo de respuestas por día
-                $responses[$created_at][ $answer->field_id] = $answer->value??null;
+                $responses[$created_at][ $answer->field_id] = [
+                    'value' => $answer->value ?? null,
+                    'type' => $answer->type, // Agregar el campo 'type'
+                ];
+
                 // Agregar el label al arreglo de labels si no existe
                 if (!isset($labels[$answer->field_id])) {
                     $labels[$answer->field_id] = [
@@ -481,8 +484,7 @@ class ResponseController extends AdminBaseController
         $sheet->getStyle("B2:AG2")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('CCCCCC');
 
         //Negrilla al titulo y su titulo
-        // $sheet->getStyle('B2')->getFont()->setBold(true);
-        $sheet->getStyle('B2:AG9')->getFont()->setBold(true);
+        $sheet->getStyle('B2:AG8')->getFont()->setBold(true);
 
         //Unión de las celdas
         $sheet->mergeCells('B2:AG2')->setCellValue('B2',$data->first()->form->name);
@@ -541,13 +543,14 @@ class ResponseController extends AdminBaseController
 
         // Inicializar el contador de fila
         $row = 9;
+        $baseUrl = config('app.url');
         // Escribir los labels en la columna A a partir de la celda B10
         foreach ($labels as $field_id => $label) {
 
             $sheet->setCellValue("B$row", $label["label"]);
             $sheet->getStyle("B$row:AG$row")->applyFromArray($styleArrayBorde);
 
-           // Verificar si el tipo de label es igual a 12 para agregar más datos a la fila
+            // Verificar si el tipo de label es igual a 12 para agregar más datos a la fila
             if ($label["type"] == 12) {
                 // Inicializamos la columna como 2 (correspondiente a la columna B)
                 $col = 2;
@@ -565,17 +568,15 @@ class ResponseController extends AdminBaseController
                 $sheet->getStyle("B$row")->getFont()->setSize(12);
             }
 
-
             // Inicializamos el dia le sumamos 2 para que arranque en la columna C
             $days = array_keys($responses);
             $day = $days[0]+2;
-
             // Escribir las respuestas organizadas por día en las columnas correspondientes
             foreach ($responses as $answer) {
                 // Verificar si el día tiene valores
                 if (isset($answer[$field_id])) {
                     // Obtener el valor para este campo y día
-                    $value = $answer[$field_id];
+                    $value = ($answer[$field_id]['type'] == 8 || $answer[$field_id]['type'] == 9) ? $baseUrl . $answer[$field_id]['value'] : $answer[$field_id]['value'] ?? null;
                     // Escribir la respuesta en la celda correspondiente
                     $sheet->setCellValueByColumnAndRow($day, $row, $value);
                 }
