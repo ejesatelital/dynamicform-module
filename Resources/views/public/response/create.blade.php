@@ -1,6 +1,6 @@
 @extends('modules.dynamic-form.layouts.master')
 @section('title')
-    Vista previa
+    Nueva respuesta
 @endsection
 @section('css')
     <link href="{{Theme::url('libs/alertifyjs/alertifyjs.min.css')}}" rel="stylesheet" type="text/css"/>

@@ -66,7 +66,8 @@ class FormResponseApiController extends Controller
                 ],
                 'search' => $request->input('search'),
                 'companies' => $request->input('companies'),
-                'form_id' => $request->input('form_id')
+                'form_id' => $request->input('form_id'),
+                'user_id' => $request->input('user_id')
             ],
             'include' => $includes, 'page' => $request->input('page'), 'take' => $request->input('limit')]));
 
