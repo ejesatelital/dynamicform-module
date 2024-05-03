@@ -1,4 +1,4 @@
-@extends('modules.dynamic-form.layouts.master')
+@extends('layouts.master')
 @section('title')
     Editar Formulario
 @endsection
