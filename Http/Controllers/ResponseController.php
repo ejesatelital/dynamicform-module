@@ -724,15 +724,12 @@ class ResponseController extends AdminBaseController
         $sheet->getStyle("B9:AG9")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('CCCCCC');
 
         //Negrilla al titulo y su titulo
-        // $sheet->getStyle('B2')->getFont()->setBold(true);
         $sheet->getStyle('B2:AG9')->getFont()->setBold(true);
 
         // Establecer el tamaño de fuente
         $sheet->getStyle('B2')->getFont()->setSize(22);
         $sheet->getStyle('B3')->getFont()->setSize(16);
         $sheet->getStyle('B5:Q8')->getFont()->setSize(12);
-        $sheet->getStyle('B9:E9')->getFont()->setSize(14);
-
 
         //Unión de las celdas
         $sheet->mergeCells('B2:AG2')->setCellValue('B2',$data->first()->form->name);
@@ -798,7 +795,6 @@ class ResponseController extends AdminBaseController
                 break;
             }
         }
-
 
         $row = 10;
 
