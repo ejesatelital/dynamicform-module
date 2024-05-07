@@ -243,8 +243,6 @@ class ResponseController extends AdminBaseController
         $drawing->setWorksheet($sheet);
 
         // //Aplico los estilo de color de letra y fondo para el titulo y los subtitulos
-        // $sheet->getStyle("B2:E2")->getFont()->getColor()->applyFromArray(['rgb' => 'FFFFFF']);
-        // $sheet->getStyle("B9:E9")->getFont()->getColor()->applyFromArray(['rgb' => 'FFFFFF']);
         $sheet->getStyle("B2:E2")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('CCCCCC');
 
         //Unión de las celdas
@@ -286,7 +284,6 @@ class ResponseController extends AdminBaseController
         $sheet->getStyle('C')->applyFromArray($centrar_texto);
         $sheet->getStyle('D')->applyFromArray($centrar_texto);
         $sheet->getStyle('B5:D8')->applyFromArray($centrar_texto_left);
-        $sheet->getStyle('B9:E9')->applyFromArray($centrar_texto);
 
         // //Alineo el titulo a la izquierda
         // $sheet->getStyle("B")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
@@ -305,36 +302,85 @@ class ResponseController extends AdminBaseController
         // comienzo el array desde la celda
         $i = 9;
         $baseUrl = config('app.url');
-        foreach ($data->answers as $dato) {
+        $type9Data = []; // Array para almacenar los datos tipo 9
 
-            $value = ($dato->type == 8 || $dato->type == 9) ? $baseUrl . $dato->value : $dato->value ?? null;
+        foreach ($data->answers as $index => $dato) {
+            $sheet->setCellValue("B$i", $dato->label);
+            $sheet->setCellValue("D$i", $dato->comment ?? null);
 
-            $sheet->setCellValue("B$i", $dato->label)
-            ->setCellValue("C$i", $value)
-            ->setCellValue("D$i", $dato->comment ?? null);
+            if ($dato->type == 9) {
+                // Guardamos los datos tipo 9 en el array
+                $type9Data[] = $dato;
+            } else {
+                // Procesamos todos los tipos excepto el tipo 9
+                if ($dato->type == 8) {
+                    // Tipo 8: Imagen
+                    $buttonValue = 'Ver Imagen';
+                    $imageUrl = $baseUrl . $dato->value;
+                    $sheet->setCellValue("C$i", $buttonValue);
+                    $sheet->getCell("C$i")->getHyperlink()->setUrl($imageUrl);
+                    $sheet->getCell("C$i")->getHyperlink()->setTooltip('Visualizar la imagen en el navegador');
+                    $sheet->getStyle("C$i")->getFont()->getColor()->applyFromArray(['rgb' => '056add']);
+                } else {
+                    // Otros tipos de datos
+                    $sheet->setCellValue("C$i", $dato->value ?? null);
+                }
 
-            if ($dato->type == 12) {
-                $sheet->getStyle("B$i:E$i")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('CCCCCC');
-                $sheet->getStyle("B$i:E$i")->getFont()->setBold(true);
-                $sheet->getStyle("B$i:E$i")->getFont()->setSize(12);
-                $sheet->setCellValue("C$i",'Respuesta');
-                $sheet->setCellValue("D$i",'Comentario');
-                $sheet->setCellValue("E$i",'Imagen');
+                // Aplicamos estilos para otros tipos de datos
+                if ($dato->type == 12) {
+                    $sheet->getStyle("B$i:E$i")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('CCCCCC');
+                    $sheet->getStyle("B$i:E$i")->getFont()->setBold(true);
+                    $sheet->setCellValue("C$i",'Respuesta');
+                    $sheet->setCellValue("D$i",'Comentario');
+                    $sheet->setCellValue("E$i",'Imagen');
+                }
+
+                // Si hay una imagen, insertamos un botón en lugar de la URL de la imagen
+                if (isset($dato->image)) {
+                    $buttonValue = 'Ver Imagen';
+                    $imageUrl = $baseUrl . $dato->image;
+                    $sheet->setCellValue("E$i", $buttonValue);
+                    $sheet->getCell("E$i")->getHyperlink()->setUrl($imageUrl);
+                    $sheet->getCell("E$i")->getHyperlink()->setTooltip('Visualizar la imagen en el navegador');
+                    $sheet->getStyle("E$i")->getFont()->getColor()->applyFromArray(['rgb' => '056add']);
+                }
+
+                // Aplicamos el estilo del borde y de enviar los datos hacia la izquierda
+                $sheet->getStyle("B$i:E$i")->applyFromArray($styleArrayBorde);
+                $sheet->getStyle("B$i:E$i")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+
+                $i++;
             }
 
-            // Verifica si hay una imagen y concatena la URL base
-            if (isset($dato->image)) {
-                $imageUrl = $baseUrl . $dato->image;
-                $sheet->setCellValue("E$i", $imageUrl??null);
-            }
 
-            //Aplico el el estilo del borde y de enviar los datos hacia la izquierda
-            $sheet->getStyle("B$i:E$i")->applyFromArray($styleArrayBorde);
-            $sheet->getStyle("B$i:E$i")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
-            $i = $i + 1;
         }
+        $last = $i;
+        // Mostramos los datos tipo 9 al final, si existen
+        foreach ($type9Data as $datoType9) {
+            $sheet->setCellValue("B$last", $datoType9->label);
 
-        //retornamos los datos y estilos
+            $path = public_path($datoType9->value);
+            // //IMAGEN DEL DOCUMENTO
+            $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
+            $drawing->setName("Firma");
+            $drawing->setDescription("Firma");
+            $drawing->setPath($path);
+            $drawing->setCoordinates("C$last");
+            $drawing->setOffsetX(10);
+            $drawing->setOffsetY(5);
+            $drawing->setResizeProportional(false);
+            $drawing->setWidthAndHeight(400, 95); //set width, height
+            $drawing->setWorksheet($sheet);
+
+            // Ajustar el alto de la fila
+            $sheet->getRowDimension($last)->setRowHeight(85); // Establecer el alto deseado en píxeles
+            $sheet->mergeCells("C$last:E$last");
+            $sheet->getStyle("B$last:E$last")->applyFromArray($styleArrayBorde);
+            $sheet->getStyle("B$last")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+
+            $last++;
+        }
+        // Retornamos los datos y estilos
         return $sheet;
     }
 
