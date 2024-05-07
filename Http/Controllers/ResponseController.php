@@ -612,24 +612,41 @@ class ResponseController extends AdminBaseController
                 $sheet->getStyle("B$row")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('CCCCCC');
                 $sheet->getStyle("B$row")->getFont()->setBold(true);
                 $sheet->getStyle("B$row")->getFont()->setSize(12);
-            }
+            }else
+            {
+                foreach ($responses as $day => $answer) {
+                    // Verificar si el día tiene valores y corresponde al índice del response
+                    if (isset($answer[$field_id])) {
+                       // Obtener el valor para este campo y día
+                        $value = ($answer[$field_id]['type'] == 8 || $answer[$field_id]['type'] == 9) ? $baseUrl . $answer[$field_id]['value'] : $answer[$field_id]['value'] ?? null;
+                        // Escribir la respuesta en la celda correspondiente según el día (índice) del response
+                        $sheet->setCellValueByColumnAndRow($day + 2, $row, $value);
 
-            // Inicializamos el dia le sumamos 2 para que arranque en la columna C
-            $days = array_keys($responses);
-            $day = $days[0]+2;
-            // Escribir las respuestas organizadas por día en las columnas correspondientes
-            foreach ($responses as $answer) {
-                // Verificar si el día tiene valores
-                if (isset($answer[$field_id])) {
-                    // Obtener el valor para este campo y día
-                    $value = ($answer[$field_id]['type'] == 8 || $answer[$field_id]['type'] == 9) ? $baseUrl . $answer[$field_id]['value'] : $answer[$field_id]['value'] ?? null;
-                    // Escribir la respuesta en la celda correspondiente
-                    $sheet->setCellValueByColumnAndRow($day, $row, $value);
+                        // Verificar si el valor es una URL (tipo 8 o 9)
+                        if ($answer[$field_id]['type'] == 8 || $answer[$field_id]['type'] == 9) {
+                            // Obtener el texto del botón y la URL completa
+                            $buttonValue = 'Ver Imagen';
+                            $imageUrl = $baseUrl . $answer[$field_id]['value'];
+
+                            // Escribir el texto del botón en la celda
+                            $sheet->setCellValueByColumnAndRow($day + 2, $row, $buttonValue);
+
+                            // Obtener la celda y configurar el hipervínculo
+                            $cell = $sheet->getCellByColumnAndRow($day + 2, $row);
+                            $cell->getHyperlink()->setUrl($imageUrl);
+                            $cell->getHyperlink()->setTooltip('Visualizar la imagen en el navegador');
+
+                            // Aplicar estilos al texto del botón para indicar que es un hipervínculo
+                            $sheet->getStyleByColumnAndRow($day + 2, $row)->getFont()->getColor()->setARGB('056add');
+                            $sheet->getStyleByColumnAndRow($day + 2, $row)->getFont()->setUnderline(true);
+                        }
+                    }
+                    // Avanzar al siguiente día para la siguiente respuesta, solo si hay datos para ese día
+                    if (isset($answer[$field_id])) {
+                        $day++;
+                    }
                 }
-                // Avanzar al siguiente día para la siguiente respuesta
-                $day++;
             }
-
             // Avanzar a la siguiente fila para el siguiente label
             $row++;
         }
