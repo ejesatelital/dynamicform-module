@@ -11,8 +11,6 @@ use Modules\Dynamicform\Http\Requests\CreateFormRequest;
 use Modules\Dynamicform\Http\Requests\UpdateFormRequest;
 use Modules\Dynamicform\Repositories\FormRepository;
 use Modules\Dynamicform\Transformers\FormTransformer;
-use Modules\Core\Http\Controllers\Api\BaseApiController;
-use Modules\User\Contracts\Authentication;
 
 class FormApiController extends Controller
 {
@@ -168,15 +166,11 @@ class FormApiController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function destroy(string $criteria, Request $request): JsonResponse
+    public function destroy($form): JsonResponse
     {
         \DB::beginTransaction();
 
         try {
-
-            $params = $this->getParamsRequest($request);
-
-            $form = $this->form->getItem($params);
 
             if (!$form) throw new Exception(trans('core::core.exceptions.item no found', ['item' => trans('dynamicform::forms.title.forms')]), 404);
 
