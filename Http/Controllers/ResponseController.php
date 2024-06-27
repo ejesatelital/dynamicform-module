@@ -169,7 +169,7 @@ class ResponseController extends AdminBaseController
 
         $responses_per_day = $forms_response->where('info.vehicle.label', $request->input('vehicle'));
 
-        if(!$responses_per_day){
+        if (!$responses_per_day || $responses_per_day->isEmpty()) {
             return redirect()->back()->with("warning", "No tiene reporte de ese dia");
         }
 
@@ -187,18 +187,18 @@ class ResponseController extends AdminBaseController
         foreach ($responses_per_day as $index => $responses_today) {
             if ($index == 0) {
                 // La primera hoja es la hoja activa por defecto
-                $reportdaysheet = $documento->getActiveSheet();
-                $reportdaysheet->setTitle('Report ' . $responses_today->form->name);
+                $reportdaysheet = $documento->getActiveSheet(0);
+                $reportdaysheet->setTitle('Reporte');
             } else {
                 // Crear nuevas hojas para los siguientes conjuntos de datos
-                $reportdaysheet = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($documento, 'Report ' . $responses_today->form->name);
+                $reportdaysheet = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($documento, 'Reporte');
                 $documento->addSheet($reportdaysheet);
             }
 
             // Llenar la hoja de trabajo con datos
             $this->reportdaysheet($reportdaysheet, $responses_today);
         }
-
+        
         // NOMBRE DEL REPORTE
         $nombre_reporte = "Reporte_Diario_" . date('Y-m-d') . ".xlsx";
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
