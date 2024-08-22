@@ -198,7 +198,7 @@ class ResponseController extends AdminBaseController
             // Llenar la hoja de trabajo con datos
             $this->reportdaysheet($reportdaysheet, $responses_today);
         }
-        
+
         // NOMBRE DEL REPORTE
         $nombre_reporte = "Reporte_Diario_" . date('Y-m-d') . ".xlsx";
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
