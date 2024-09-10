@@ -442,6 +442,7 @@ class ResponseController extends AdminBaseController
                 $responses[$created_at][ $answer->field_id] = [
                     'value' => $answer->value ?? null,
                     'type' => $answer->type, // Agregar el campo 'type'
+                    'finding' => $answer->finding ?? null,
                 ];
 
                 // Agregar el label al arreglo de labels si no existe
@@ -498,16 +499,6 @@ class ResponseController extends AdminBaseController
             ),
         );
 
-        // Establecer el ancho de las columnas desde C hasta AG
-        $columnas = range('C', 'AG');
-        foreach ($columnas as $col) {
-            $sheet->getColumnDimension($col)->setWidth(3.42);
-        }
-
-        //Tamaño de columnas
-        $sheet->getColumnDimension('A')->setWidth(2.42);
-        $sheet->getColumnDimension('B')->setWidth(45.42);
-
         //Tamaño de las filas
         $sheet->getRowDimension(2)->setRowHeight(50.42);
         $sheet->getRowDimension(3)->setRowHeight(26.42);
@@ -515,6 +506,15 @@ class ResponseController extends AdminBaseController
         $sheet->getRowDimension(5)->setRowHeight(17.42);
         $sheet->getRowDimension(6)->setRowHeight(17.42);
         $sheet->getRowDimension(7)->setRowHeight(10.42);
+
+        foreach (range(3, 33) as $col) {
+            $sheet->getColumnDimensionByColumn($col)->setAutoSize(false);
+            $sheet->getColumnDimensionByColumn($col)->setWidth(7);
+        }
+
+        //Tamaño de columnas
+        $sheet->getColumnDimension('A')->setWidth(2.42);
+        $sheet->getColumnDimension('B')->setWidth(42);
 
         if($data->first()->company->logo!=null){
             $path = public_path($data->first()->company->logo);
@@ -626,9 +626,13 @@ class ResponseController extends AdminBaseController
                     if (isset($answer[$field_id])) {
                        // Obtener el valor para este campo y día
                         $value = ($answer[$field_id]['type'] == 8 || $answer[$field_id]['type'] == 9) ? $baseUrl . $answer[$field_id]['value'] : $answer[$field_id]['value'] ?? null;
+                        if ($answer[$field_id]['finding'] != null)
+                        {
+                            $sheet->getStyleByColumnAndRow($day + 2, $row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('FF0000'); // Fondo rojo
+                            $sheet->getStyleByColumnAndRow($day + 2, $row)->getFont()->getColor()->setARGB('FFFFFF'); // Texto blanco
+                        }
                         // Escribir la respuesta en la celda correspondiente según el día (índice) del response
                         $sheet->setCellValueByColumnAndRow($day + 2, $row, $value);
-
                         // Verificar si el valor es una URL (tipo 8 o 9)
                         if ($answer[$field_id]['type'] == 8 || $answer[$field_id]['type'] == 9) {
                             // Obtener el texto del botón y la URL completa
@@ -886,6 +890,5 @@ class ResponseController extends AdminBaseController
         //retornamos los datos y estilos
         return $sheet;
     }
-
 
 }
