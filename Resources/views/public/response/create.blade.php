@@ -409,7 +409,8 @@
                     "millage": document.getElementById("vehicleMillage").value
                     }
                 },
-                "answers": []
+                "answers": [],
+                "location": {}
             };
 
             // Recolectar respuestas de campos dinámicos
@@ -524,8 +525,8 @@
         }
 
         var formImagesAnswers = {
-                "answers": []
-            };
+            "answers": []
+        };
 
         // Sube el archivo al almacenamiento
         function uploadImageToServer(id, label, type, canvasId = 'signatureCanvas') {
@@ -591,7 +592,6 @@
                     alert("Guardado correctamente!")
                 } else {
                     // Manejar el caso en que la solicitud no fue exitosa
-                    // console.log(response.status);
                     throw new Error('Error al cargar la imagen');
                 }
             })
@@ -659,6 +659,40 @@
                     return;
                 }
 
+                // obtener la geolacalización
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            let lat = position.coords.latitude;
+                            let long = position.coords.longitude;
+
+                            // Guardar las coordenadas en formData.location
+                            formData.info.location = {
+                                latitude: lat,
+                                longitude: long
+                            };
+                        },
+                        (error) => {
+                        switch(error.code) {
+                            case error.PERMISSION_DENIED:
+                                alert("No tienes activo el permiso de geolocalización.");
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                alert("La información de ubicación no está disponible..");
+                                break;
+                            case error.TIMEOUT:
+                                alert("Se agotó el tiempo de espera de la solicitud para obtener la ubicación del usuario.");
+                                break;
+                            case error.UNKNOWN_ERROR:
+                                alert("Se produjo un error desconocido al obtener la ubicación.");
+                                break;
+                            }
+                        }
+                    );
+                } else {
+                    alert("Este navegador no admite la geolocalización.");
+                }
+
                 // Estructura de datos para enviar a la api
                 var datos = {
                     form_id: {{$form->id}},
@@ -697,7 +731,6 @@
                                 window.location.href = "{{ route('dynamicform.form.indexcolaboradoresform') }}";
                             } else {
                                 // Manejar el caso en que la solicitud no fue exitosa
-                                // console.log(response.status);
                                 throw new Error('Error al cargar la imagen');
                             }
                         }).catch(error => {

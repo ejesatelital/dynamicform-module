@@ -67,7 +67,7 @@
                     <div class="row">
                         <div class="col-sm-6">
                             <div class="text-muted">
-                                <h5 class="font-size-28 mb-3"><strong> Colaborador: </strong></h5>
+                                <h5 class="font-size-28 mb-3"><strong> Datos del registro: </strong></h5>
 
                                 <h5 class="font-size-15 mb-1">{{$form_response->data->info->fullName ?? null}}</h5>
                                 <p>{{$form_response->data->info->identification ?? null}}</p>
@@ -75,11 +75,18 @@
                                  <h5 class="font-size-15 mb-1">Placa del vehículo:</h5>
                                  <p>{{$form_response->data->info->vehicle->label ?? null}}</p>
 
-                                 <h5 class="font-size-15 mb-1">Kilometraje del vehículo:</h5>
-                                 <p>{{$form_response->data->info->vehicle->millage ?? null}}</p>
+                                 @if ($form_response->data->info->vehicle->millage)
+                                    <h5 class="font-size-15 mb-1">Kilometraje del vehículo:</h5>
+                                    <p>{{$form_response->data->info->vehicle->millage}}</p>
+                                 @endif
 
                                  <h5 class="font-size-15 mb-1">Fecha de registro:</h5>
                                  <p>{{$form_response->created_at ?? null}}</p>
+
+                                 @if (isset($form_response->data->info->location))
+                                    <h5 class="font-size-15 mb-1">Ubicación del registro:</h5>
+                                    <a href="https://maps.google.com/maps?q= {{$form_response->data->info->location->latitude.",".$form_response->data->info->location->longitude}}" target="_blank">Ver en el mapa</a>
+                                 @endif
                             </div>
                         </div>
                         <!-- end col -->
@@ -104,7 +111,7 @@
                             <a href="javascript:window.print()" class="btn btn-success me-1" title="Imprimir pantalla">
                                 <i class="fa fa-print"></i>
                             </a>
-                            <a href="{{route('dynamicform.formresponses.downloadpdf', [$form_response->form_id,$form_response->id])}}" class="btn btn-danger" title="Descargar PDF" class="text-danger">
+                            <a href="{{route('dynamicform.formresponses.downloadpdf', [$form_response->form_id,$form_response->id])}}" class="btn btn-danger" title="Descargar PDF" class="text-danger" target="_blank">
                                 <i class="far fa-file-pdf"></i>
                             </a>
                         </div>

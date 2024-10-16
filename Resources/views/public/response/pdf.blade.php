@@ -60,12 +60,19 @@
                 <td width="33%">
                     <h6 class="mb-0">Placa:</h6>
                     <p>{{$form_response->data->info->vehicle->label ?? null}}</p>
-                    <h6 class="mb-0">Fecha de registro:</h6>
-                    <p>{{$form_response->created_at ?? null}}</p>
-                </td>
-                <td width="33%">
                     <h6 class="mb-0">Kilometraje:</h6>
                     <p>{{$form_response->data->info->vehicle->millage ?? 0}}</p>
+                </td>
+                <td width="33%">
+                    <h6 class="mb-0">Fecha de registro:</h6>
+                    <p>{{$form_response->created_at ?? null}}</p>
+                    @if (isset($form_response->data->info->location))
+                        <h6 class="mb-0">Lugar de registro:</h6>
+                        <a href="https://maps.google.com/maps?q={{$form_response->data->info->location->latitude.",".$form_response->data->info->location->longitude}}" target="_blank">
+                            Ver en el mapa
+                        </a>
+                    @endif
+
                 </td>
             </tr>
         </table>
